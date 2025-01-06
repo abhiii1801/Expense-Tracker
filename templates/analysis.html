@@ -1,0 +1,435 @@
+{% extends 'home.html' %}
+
+{% block head %}
+<style>
+    .scrollable-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollable-container {
+        overflow-y: auto;
+        -ms-overflow-style: none; 
+        scrollbar-width: none; 
+    }
+</style>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="/static/analysis.js"></script>
+{% endblock %}
+
+
+{% block content %}
+    <div class="row mb-4">
+        <a href="/home/records/" style="color: black; text-decoration: none;">
+            <h5 class="card-title mb-3">Accounts</h5> 
+        </a>
+        {% for item in accounts %}
+        <div class="col-md-3 mt-3">
+            <div class="card">
+                <div class="card-body">
+                    <div class="h5 mb-2 {% if item['account_type'] == 'Cash' %}text-success{% elif item['account_type'] == 'Bank Account' %}text-primary{% else %}text-warning{% endif %} mb-3">
+                        {{ item['account_name'] }}
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        {% if item['account_type'] == 'Cash' %}
+                            <i class="fas fa-money-bill-wave text-success fs-4 me-3"></i>
+                        {% elif item['account_type'] == 'Bank Account' %}
+                            <i class="fas fa-university text-primary fs-4 me-3"></i>
+                        {% else %}
+                            <i class="fas fa-wallet text-warning fs-4 me-3"></i>
+                        {% endif %}
+                        <div>
+                            <div class="h5 mb-0">₹ {{ item['balance'] }}</div>
+                            <div class="{% if item['account_type'] == 'Cash' %}text-success{% elif item['account_type'] == 'Bank Account' %}text-primary{% else %}text-warning{% endif %}">
+                                {{ item['account_type'] }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <div class="col">
+            <button class="btn btn-light mt-3" data-bs-toggle="modal" data-bs-target="#accountModal">+ Add Account</button>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end mt-3 mb-3">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#recordModal">+ Add Record</button>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <a href="/home/records/" style="color: black; text-decoration: none;">
+                        <h5 class="card-title mb-3">Incomes</h5> 
+                    </a>
+                    <div class="scrollable-container overflow-auto m-1" style="height: calc(40px * 8 + 30px);">
+                        <ul class="list-unstyled">
+                            {% for record in incomes %}
+                            <li class="d-flex align-items-center justify-content-between mb-3 p-2 rounded shadow-sm" 
+                                style="border: 1px solid rgba(0, 0, 0, 0.1); margin-bottom: 1rem;">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
+                                         style="width: 40px; height: 40px;">
+                                        {% if record['record_category'] == 'Salary' %}
+                                            <i class="fa fa-briefcase text-success fs-4"></i>
+                                        {% elif record['record_category'] == 'Business' %}
+                                            <i class="fas fa-chart-line text-primary fs-4"></i>
+                                        {% elif record['record_category'] == 'Rental' %}
+                                            <i class="fa fa-home fs-4 text-warning"></i>
+                                        {% elif record['record_category'] == 'Investment' %}
+                                            <i class="fa fa-coins fs-4 text-info"></i>
+                                        {% elif record['record_category'] == 'Freelancing' %}
+                                            <i class="fa fa-laptop-code fs-4 text-danger"></i>
+                                        {% else %}
+                                            <i class="fas fa-question fs-4 text-muted"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-3">
+                                        <div class="fw-bold">{{ record['record_category'] }}</div>
+                                        <div class="text-muted small">
+                                            {{ record['account_name'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="text-success">+ ₹{{ record['amount'] }}</div>
+                                    <div class="text-muted small">{{ record['formatted_date'] }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <a href="/home/records/" style="color: black; text-decoration: none;">
+                        <h5 class="card-title mb-3">Expenses</h5> 
+                    </a>
+                    <div class="scrollable-container overflow-auto m-1" style="height: calc(40px * 8 + 30px);">
+                        <ul class="list-unstyled">
+                            {% for record in expenses %}
+                            <li class="d-flex align-items-center justify-content-between mb-3 p-2 rounded shadow-sm" 
+                                style="border: 1px solid rgba(0, 0, 0, 0.1); margin-bottom: 1rem;">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white" 
+                                         style="width: 40px; height: 40px;">
+                                        {% if record['record_category'] == 'Food' %}
+                                            <i class="fa fa-burger text-success fs-4"></i>
+                                        {% elif record['record_category'] == 'Transportation' %}
+                                            <i class="fas fa-car text-primary fs-4"></i>
+                                        {% elif record['record_category'] == 'Entertainment' %}
+                                            <i class="fa fa-film fs-4 text-warning"></i>
+                                        {% elif record['record_category'] == 'Shopping' %}
+                                            <i class="fa fa-shopping-cart fs-4 text-info"></i>
+                                        {% elif record['record_category'] == 'Health' %}
+                                            <i class="fa fa-heartbeat fs-4 text-danger"></i>
+                                        {% else %}
+                                            <i class="fas fa-question fs-4 text-muted"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="ms-3">
+                                        <div class="fw-bold">{{ record['record_category'] }}</div>
+                                        <div class="text-muted small">
+                                            {{ record['account_name'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="text-danger">- ₹{{ record['amount'] }}</div>
+                                    <div class="text-muted small">{{ record['formatted_date'] }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>         
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <a href="/home/records/" style="color: black; text-decoration: none;">
+                        <h5 class="card-title mb-3">Transfers</h5> 
+                    </a>
+                    <div class="scrollable-container overflow-auto m-1" style="height: calc(40px * 8 + 30px);">
+                        <ul class="list-unstyled">
+                            {% for record in transfers %}
+                            <li class="d-flex align-items-center justify-content-between mb-3 p-2 rounded shadow-sm"
+                                style="border: 1px solid rgba(0, 0, 0, 0.1); margin-bottom: 1rem;">
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white"
+                                        style="width: 40px; height: 40px;">
+                                        <i class="fas fa-exchange-alt fs-4 text-primary"></i>
+                                    </div>
+                                    <div class="ms-3">
+                                        <div class="fw-bold">Transfer</div>
+                                        <div class="text-muted small">
+                                            From: {{ record['from_account_name'] }} <br>
+                                            To: {{ record['to_account_name'] }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <div class="text-success">₹{{ record['amount'] }}</div>
+                                    <div class="text-muted small">{{ record['formatted_date'] }}</div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Expenses by Category</h5>
+                    <div id="piechart" style="width: 100%; height: 100%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Monthly Expenses</h5>
+                    <div id="barchart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Cash Flow</h5>
+                    <div id="linechart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title mb-3">Expenses by Account</h5>
+                    <div id="accountchart" style="width: 100%; height: 300px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Modal for + Record -->
+    <div class="modal fade" id="recordModal" tabindex="-1" aria-labelledby="recordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="recordModalLabel">Add Record</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-pills nav-justified mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="expense-tab" data-bs-toggle="pill" data-bs-target="#expense" type="button" role="tab" aria-controls="expense" aria-selected="true">Expense</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="income-tab" data-bs-toggle="pill" data-bs-target="#income" type="button" role="tab" aria-controls="income" aria-selected="false">Income</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="transfer-tab" data-bs-toggle="pill" data-bs-target="#transfer" type="button" role="tab" aria-controls="transfer" aria-selected="false">Transfer</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <!-- Expense Form -->
+                        <div class="tab-pane fade show active" id="expense" role="tabpanel" aria-labelledby="expense-tab">
+                            <form id="expense-form" action="/add_expense" method="POST">
+                                <div class="mb-3">
+                                    <label for="accountType" class="form-label">Account</label>
+                                    <select id="accountType" name="accountName" class="form-select">
+                                        {% if accounts %}
+                                            {% for account in accounts %}
+                                                <option value="{{ account.account_name }}" >{{ account.account_name }} ({{ account.account_type }})</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="amount" class="form-label">Amount</label>
+                                    <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount" required min="1">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="recordCategory" class="form-label">Record Category</label>
+                                    <select id="recordCategory" name="recordCategory" class="form-select">
+                                        <option selected>Food</option>
+                                        <option>Transportation</option>
+                                        <option>Entertainment</option>
+                                        <option>Shopping</option>
+                                        <option>Health</option>
+                                        <option>Others</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="datetime" class="form-label">Date & Time</label>
+                                    <input type="datetime-local" name="datetime" class="datetime form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea id="description" name="recordDescription" class="form-control" rows="3" placeholder="Add a description (optional)"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" form="expense-form" class="btn btn-primary ms-auto">Add Expense</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Income Form -->
+                        <div class="tab-pane fade" id="income" role="tabpanel" aria-labelledby="income-tab">
+                            <form id="income-form" action="/add_income" method="POST">
+                                <div class="mb-3">
+                                    <label for="accountType" class="form-label">Account</label>
+                                    <select id="accountType" name="accountName" class="form-select">
+                                        {% if accounts %}
+                                            {% for account in accounts %}
+                                                <option value="{{ account.account_name }}" >{{ account.account_name }} ({{ account.account_type }})</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="recordCategory" class="form-label">Record Category</label>
+                                    <select id="recordCategory" name="recordCategory" class="form-select">
+                                        <option selected>Salary</option>
+                                        <option>Business</option>
+                                        <option>Rental</option>
+                                        <option>Investment</option>
+                                        <option>Freelancing</option>
+                                        <option>Others</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="incomeAmount" class="form-label">Amount</label>
+                                    <input type="number" id="incomeAmount" name="incomeAmount" class="form-control" min="1" placeholder="Enter amount" required >
+                                </div>
+                                <div class="mb-3">
+                                    <label for="datetime" class="form-label">Date & Time</label>
+                                    <input type="datetime-local" name="datetime" class="datetime form-control"required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="Add a description (optional)"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" form="income-form" class="btn btn-primary ">Add Income</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Transfer Form -->
+                        <div class="tab-pane fade" id="transfer" role="tabpanel" aria-labelledby="transfer-tab">
+                            <form id="transfer-form" action="/add_transfer" method="POST">
+                                <div class="mb-3">
+                                    <label for="fromAccount" class="form-label">From Account</label>
+                                    <select id="fromAccount" name="fromAccount" class="form-select">
+                                        {% if accounts %}
+                                            {% for account in accounts %}
+                                                <option value="{{ account.account_name }}">{{ account.account_name }} ({{ account.account_type }})</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="toAccount" class="form-label">To Account</label>
+                                    <select id="toAccount" name="toAccount" class="form-select">
+                                        {% if accounts %}
+                                            {% for account in accounts %}
+                                                <option value="{{ account.account_name }}">{{ account.account_name }} ({{ account.account_type }})</option>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="transferAmount" class="form-label">Amount</label>
+                                    <input type="number" id="transferAmount" name="transferAmount" class="form-control" placeholder="Enter amount" required min="1">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="datetime" class="form-label">Date & Time</label>
+                                    <input type="datetime-local" name="datetime" class="datetime form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="Add a description (optional)"></textarea>
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" form="transfer-form" class="btn btn-primary">Add Transfer</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Modal for Add Account -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="accountModalLabel">Add Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="accountForm" action="/add_account" method="POST">
+                        <div class="mb-3">
+                            <label for="accountName" class="form-label">Account Name</label>
+                            <input type="text" id="accountName" name="accountName" class="form-control" placeholder="Enter Account Name" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="accountType" class="form-label">Account Type</label>
+                            <select id="accountType" name="accountType" class="form-select">
+                                <option selected >Cash</option>
+                                <option >Bank Account</option>
+                                <option >Credit Card</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="currentBalance" class="form-label">Current Balance</label>
+                            <input type="number" id="currentBalance" name="currentBalance" class="form-control" placeholder="Enter current balance" required>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" form="accountForm" class="btn btn-primary">Add Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const now = new Date();
+        const localDateTime = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0') + 'T' +
+            String(now.getHours()).padStart(2, '0') + ':' +
+            String(now.getMinutes()).padStart(2, '0');
+            const inputs = document.getElementsByClassName('datetime');
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].value = localDateTime;
+            }
+        var expensesData = {{ expenses | tojson }};
+    </script>
+{% endblock %}
