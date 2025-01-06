@@ -30,11 +30,6 @@ SpendWise is a Flask-based web application designed to help users track their fi
 ### 8. Error Handling:
 - Validations for user inputs and database transactions.
 
-## Technologies Used
-- Backend: Flask (Python)
-- Database: MongoDB
-- Data Visualization: Plotly
-- Frontend: HTML Templates (Flask Jinja2)
 
 ## Screenshots
 
@@ -51,5 +46,9 @@ SpendWise is a Flask-based web application designed to help users track their fi
 ![Screenshot (95)](https://github.com/user-attachments/assets/a0dff02e-5812-4814-a2dd-f5870f7e3cca)
 ![Screenshot (94)](https://github.com/user-attachments/assets/1d6201fc-c438-4ed4-9c5c-6b7aff8109b4)
 
-  
+## Technologies Used
+- Backend: Flask (Python)
+- Database: MongoDB
+- Data Visualization: Plotly
+- Frontend: HTML Templates (Flask Jinja2)
 
